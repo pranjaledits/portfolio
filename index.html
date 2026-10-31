@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pranjal | Video Editor</title>
+<meta name="theme-color" content="#eef0f4">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pranjal | Video Editor from Nepal">
+<meta property="og:description" content="Short-form, YouTube and more. Flexible on pricing and schedule, quick to reply, easy to work with.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314161c'/%3E%3Crect x='14.5' y='5' width='3' height='22' rx='1.5' fill='%23c8102e'/%3E%3C/svg%3E">
 <meta name="description" content="Video editor from Nepal. Short-form, YouTube, and everything in between. Flexible on pricing and schedule.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -114,37 +119,49 @@
   }
 
   /* ---------- Sections ---------- */
-  section { padding: clamp(64px, 10vw, 120px) 0 0; }
+  section { padding: clamp(64px, 10vw, 120px) 0 0; scroll-margin-top: 48px; }
   h2 { font-family: var(--display); font-weight: 800; font-size: clamp(32px, 5vw, 56px); letter-spacing: -.03em; line-height: 1.02; margin: 0 0 14px; }
   .sub { color: var(--ink-soft); max-width: 56ch; margin: 0 0 40px; }
 
-  /* Work */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 28px 24px; }
-  .grid + .grid { margin-top: 28px; }
-  .grid.tall { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 325px)); }
-  .grid.tall .frame { aspect-ratio: 9 / 16; }
+  /* Work: uniform cards, video opens in a popup player sized to the video */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 36px 28px; }
   .work { margin: 0; }
-  .frame { position: relative; aspect-ratio: 16 / 9; background: var(--track); border-radius: 12px; overflow: hidden; }
-  .frame img, .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
-  .play {
-    position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; cursor: pointer;
-    background: linear-gradient(180deg, rgba(20,22,28,0) 40%, rgba(20,22,28,.55));
-    display: grid; place-items: center;
+  .thumb {
+    position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; padding: 0; border: 0;
+    border-radius: 14px; overflow: hidden; background: var(--track); cursor: pointer;
+    box-shadow: 0 1px 2px rgba(20,22,28,.12), 0 10px 24px -14px rgba(20,22,28,.4);
+    transition: transform .2s, box-shadow .2s;
   }
-  .play span {
-    width: 64px; height: 64px; border-radius: 50%; background: var(--crimson);
-    display: grid; place-items: center; transition: transform .15s;
+  .thumb:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(20,22,28,.14), 0 20px 32px -16px rgba(20,22,28,.5); }
+  .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+  .thumb.is-tall img { object-fit: contain; }
+  .thumb:hover img { transform: scale(1.03); }
+  .thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,22,28,0) 45%, rgba(20,22,28,.55)); }
+  .poster {
+    position: absolute; inset: 0; display: grid; place-content: center; text-align: center;
+    font: 800 clamp(26px, 4vw, 38px)/1 var(--display); letter-spacing: -.03em; color: #fff;
+    background: radial-gradient(120% 120% at 20% 10%, #3a4157, var(--track) 60%);
   }
-  .play:hover span { transform: scale(1.08); }
-  .play span::after { content: ""; border-left: 18px solid #fff; border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 4px; }
-  .empty {
-    position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 20px;
-    color: #9aa2b6; font-size: 14px; border: 2px dashed #3d4458; border-radius: 12px;
-  }
-  .empty b { color: #fff; font-weight: 600; display: block; margin-bottom: 4px; }
-  .work figcaption { padding-top: 12px; }
+  .dot { position: absolute; z-index: 2; left: 50%; top: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; background: var(--crimson); display: grid; place-items: center; transition: transform .15s; }
+  .dot::after { content: ""; border-left: 17px solid #fff; border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 4px; }
+  .thumb:hover .dot { transform: scale(1.1); }
+  .badge { position: absolute; z-index: 2; left: 12px; top: 12px; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #fff; background: rgba(20,22,28,.7); backdrop-filter: blur(6px); }
+  .empty { aspect-ratio: 16 / 9; display: grid; place-content: center; text-align: center; padding: 20px; color: #9aa2b6; font-size: 14px; background: var(--track); border: 2px dashed #3d4458; border-radius: 14px; }
+  .empty b { color: #fff; display: block; margin-bottom: 4px; }
+  .work figcaption { padding-top: 14px; }
   .work h3 { font-family: var(--display); font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -.01em; }
   .work .tag { font-size: 14px; color: var(--ink-soft); }
+
+  .modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgba(14,16,22,.9); backdrop-filter: blur(6px); }
+  .modal[hidden] { display: none; }
+  .stage { position: relative; width: min(960px, 100%, calc(86vh * 16 / 9)); aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; }
+  .stage.tall { width: min(100%, calc(86vh * 9 / 16)); aspect-ratio: 9 / 16; }
+  .stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .close { position: absolute; top: 16px; right: 16px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: #fff; color: var(--ink); font-size: 24px; line-height: 1; cursor: pointer; }
+  .close:hover { background: var(--crimson); color: #fff; }
+
+  .status { display: inline-flex; align-items: center; gap: 9px; margin: 0 0 24px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); font-size: 14px; font-weight: 500; color: var(--ink-soft); }
+  .status i { width: 8px; height: 8px; border-radius: 50%; background: #2f9e6b; box-shadow: 0 0 0 4px rgba(47,158,107,.18); }
 
   .more { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
   .more p { margin: 0; color: var(--ink-soft); }
@@ -214,6 +231,7 @@
   <!-- HERO -->
   <div class="hero">
     <div class="wrap">
+      <p class="status"><i></i>Available for new projects</p>
       <h1>Video editing that keeps people <span class="r">watching.</span></h1>
       <p class="lead">I'm <span data-name>Pranjal</span>, a video editor from Nepal. Short-form, YouTube, promos and more, cut to fit your style and your deadline.</p>
       <div class="cta-row">
@@ -251,7 +269,7 @@
     <div class="wrap">
       <h2>Selected work</h2>
       <p class="sub">A mix of formats and styles. Press play on any of them.</p>
-      <div id="grid"></div>
+      <div class="grid" id="grid"></div>
       <div class="more">
         <p>Want to see more? Every project is organised in folders.</p>
         <a class="btn" id="driveBtn" href="#contact">Browse all my work</a>
@@ -283,6 +301,7 @@
         <p>I'm a video editor based in Nepal. I've spent years sharpening my craft, and I'm now taking on client work.</p>
         <p>I'm an all-rounder, so I'm comfortable switching between styles and formats. Send me a reference and a rough idea, and I'll take it from there.</p>
         <p>I'm flexible on pricing and schedules, so tell me your budget and deadline and we'll find a setup that works.</p>
+        <p>Talk to me like a friend, not a business. Tell me what to change and I'll change it, so there's no need to worry about revisions.</p>
       </div>
       <div class="facts">
         <dl>
@@ -290,7 +309,7 @@
           <div class="fact"><dt>Rates</dt><dd>Flexible, project-based</dd></div>
           <div class="fact"><dt>Schedule</dt><dd>Flexible</dd></div>
           <div class="fact"><dt>Revisions</dt><dd>Included</dd></div>
-          <div class="fact"><dt>Reply time</dt><dd>Usually within a day</dd></div>
+          <div class="fact"><dt>Reply time</dt><dd>As fast as I can</dd></div>
         </dl>
       </div>
     </div>
@@ -313,6 +332,11 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Video player" hidden>
+  <button class="close" id="closeBtn" type="button" aria-label="Close video">&times;</button>
+  <div class="stage" id="stage"></div>
+</div>
+
 <script>
 /* =====================================================
    EDIT THIS SECTION ONLY. Everything else updates itself.
@@ -333,11 +357,11 @@ const SITE = {
             (TikTok videos always show in a tall frame). */
 const WORKS = [
   { title: "Short-form content about football", type: "TikTok",         tiktok: "7702493527657237793" },
-  { title: "Short-form content",                type: "YouTube Shorts", youtube: "bMF4KwJuRqo", tall: true },
+  { title: "Short-form content",                type: "Short-form",     youtube: "iyGJWLVMHYA" },
   { title: "Humorous and meme content",         type: "Long format",    youtube: "jG3_yLvm8sA" },
   { title: "Documentary",                       type: "Documentary",    youtube: "Dp3IESaTwDk" },
   { title: "Gaming edit",                       type: "Gaming",         youtube: "lFVOBqX_5FE" },
-  { title: "Short-form content",                type: "Short-form",     youtube: "iyGJWLVMHYA" }
+  { title: "Short-form content",                type: "YouTube Shorts", youtube: "bMF4KwJuRqo", tall: true }
 ];
 /* ===================================================== */
 
@@ -380,48 +404,71 @@ if (SITE.discord) {
 if (SITE.twitter) addLink("X / Twitter", SITE.twitter, true);
 if (SITE.instagram) addLink("Instagram", SITE.instagram, true);
 
-/* Work grid */
-const gridBox = document.getElementById("grid");
-let grid = null, gridTall = null;
-WORKS.forEach(w => {
-  const tall = !!(w.tall || w.tiktok);
-  if (!grid || gridTall !== tall) {
-    grid = document.createElement("div");
-    grid.className = "grid" + (tall ? " tall" : "");
-    gridBox.appendChild(grid);
-    gridTall = tall;
-  }
-  const fig = document.createElement("figure"); fig.className = "work";
-  const frame = document.createElement("div"); frame.className = "frame";
+/* Work grid and popup player */
+const grid = document.getElementById("grid");
+const modal = document.getElementById("modal");
+const stage = document.getElementById("stage");
+const closeBtn = document.getElementById("closeBtn");
+let opener = null;
 
+function playerSrc(w) {
   const tt = w.tiktok ? String(w.tiktok).match(/\d{8,}/) : null;
-  if (tt) {
-    frame.innerHTML = '<iframe src="https://www.tiktok.com/player/v1/' + tt[0] +
-      '?autoplay=0" title="' + w.title.replace(/"/g, "") +
-      '" allow="fullscreen" loading="lazy"></iframe>';
-  } else if (w.youtube) {
-    const img = document.createElement("img");
-    img.src = "https://i.ytimg.com/vi/" + w.youtube + "/hqdefault.jpg";
-    img.alt = ""; img.loading = "lazy";
+  if (tt) return "https://www.tiktok.com/player/v1/" + tt[0] + "?autoplay=1";
+  if (w.youtube) return "https://www.youtube-nocookie.com/embed/" + w.youtube + "?autoplay=1&rel=0";
+  return "";
+}
+function openPlayer(w, btn) {
+  opener = btn;
+  stage.className = "stage" + (w.tall || w.tiktok ? " tall" : "");
+  const f = document.createElement("iframe");
+  f.src = playerSrc(w); f.title = w.title;
+  f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+  f.allowFullscreen = true;
+  stage.replaceChildren(f);
+  modal.hidden = false;
+  document.body.style.overflow = "hidden";
+  closeBtn.focus();
+}
+function closePlayer() {
+  modal.hidden = true;
+  stage.replaceChildren();
+  document.body.style.overflow = "";
+  if (opener) opener.focus();
+}
+closeBtn.addEventListener("click", closePlayer);
+modal.addEventListener("click", e => { if (e.target === modal) closePlayer(); });
+addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closePlayer(); });
+
+WORKS.forEach(w => {
+  const fig = document.createElement("figure"); fig.className = "work";
+  const tall = !!(w.tall || w.tiktok);
+
+  if (playerSrc(w)) {
     const btn = document.createElement("button");
-    btn.className = "play"; btn.type = "button";
+    btn.type = "button"; btn.className = "thumb" + (tall ? " is-tall" : "");
     btn.setAttribute("aria-label", "Play " + w.title);
-    btn.innerHTML = "<span></span>";
-    btn.addEventListener("click", () => {
-      frame.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + w.youtube +
-        '?autoplay=1&rel=0" title="' + w.title.replace(/"/g, "") +
-        '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
-    });
-    frame.append(img, btn);
+    if (w.youtube) {
+      const img = document.createElement("img");
+      img.src = "https://i.ytimg.com/vi/" + w.youtube + "/hqdefault.jpg";
+      img.alt = ""; img.loading = "lazy";
+      btn.appendChild(img);
+    } else {
+      const ph = document.createElement("div"); ph.className = "poster"; ph.textContent = w.type;
+      btn.appendChild(ph);
+    }
+    if (tall) { const b = document.createElement("span"); b.className = "badge"; b.textContent = "Vertical"; btn.appendChild(b); }
+    const dot = document.createElement("span"); dot.className = "dot"; btn.appendChild(dot);
+    btn.addEventListener("click", () => openPlayer(w, btn));
+    fig.appendChild(btn);
   } else {
-    frame.innerHTML = '<div class="empty"><div><b>Add your edit here</b>Paste a YouTube ID in the WORKS list</div></div>';
+    fig.innerHTML = '<div class="empty"><div><b>Add your edit here</b>Paste a YouTube ID in the WORKS list</div></div>';
   }
 
   const cap = document.createElement("figcaption");
   cap.innerHTML = "<h3></h3><span class='tag'></span>";
   cap.querySelector("h3").textContent = w.title;
   cap.querySelector(".tag").textContent = w.type;
-  fig.append(frame, cap);
+  fig.appendChild(cap);
   grid.appendChild(fig);
 });
 
