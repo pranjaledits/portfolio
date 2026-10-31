@@ -120,6 +120,9 @@
 
   /* Work */
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 28px 24px; }
+  .grid + .grid { margin-top: 28px; }
+  .grid.tall { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 325px)); }
+  .grid.tall .frame { aspect-ratio: 9 / 16; }
   .work { margin: 0; }
   .frame { position: relative; aspect-ratio: 16 / 9; background: var(--track); border-radius: 12px; overflow: hidden; }
   .frame img, .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
@@ -248,7 +251,7 @@
     <div class="wrap">
       <h2>Selected work</h2>
       <p class="sub">A mix of formats and styles. Press play on any of them.</p>
-      <div class="grid" id="grid"></div>
+      <div id="grid"></div>
       <div class="more">
         <p>Want to see more? Every project is organised in folders.</p>
         <a class="btn" id="driveBtn" href="#contact">Browse all my work</a>
@@ -322,13 +325,19 @@ const SITE = {
   drive:   "https://drive.google.com/drive/folders/1DUD91xteClSnzBWzL7BPiBA_Y_7TcyO3?usp=sharing"  // your Google Drive folder link
 };
 
-/* Add your edits here. Upload each video to YouTube (unlisted is fine),
-   then paste the ID: the part after "v=" in youtube.com/watch?v=THIS_PART
-   For Shorts: youtube.com/shorts/THIS_PART */
+/* Add your edits here. The order of this list is the order on the site.
+   YouTube: paste the ID, the part after "v=" in youtube.com/watch?v=THIS_PART
+            (youtu.be/THIS_PART and youtube.com/shorts/THIS_PART work the same way).
+            For a vertical YouTube Short, add  tall: true
+   TikTok:  use  tiktok: "THIS_NUMBER"  from tiktok.com/@name/video/THIS_NUMBER
+            (TikTok videos always show in a tall frame). */
 const WORKS = [
-  { title: "Gaming edit",        type: "Gaming",       youtube: "lFVOBqX_5FE" },
-  { title: "Documentary",        type: "Documentary",  youtube: "Dp3IESaTwDk" },
-  { title: "Short-form content", type: "Short-form",   youtube: "iyGJWLVMHYA" }
+  { title: "Short-form content about football", type: "TikTok",         tiktok: "7702493527657237793" },
+  { title: "Short-form content",                type: "YouTube Shorts", youtube: "bMF4KwJuRqo", tall: true },
+  { title: "Humorous and meme content",         type: "Long format",    youtube: "jG3_yLvm8sA" },
+  { title: "Documentary",                       type: "Documentary",    youtube: "Dp3IESaTwDk" },
+  { title: "Gaming edit",                       type: "Gaming",         youtube: "lFVOBqX_5FE" },
+  { title: "Short-form content",                type: "Short-form",     youtube: "iyGJWLVMHYA" }
 ];
 /* ===================================================== */
 
@@ -372,12 +381,25 @@ if (SITE.twitter) addLink("X / Twitter", SITE.twitter, true);
 if (SITE.instagram) addLink("Instagram", SITE.instagram, true);
 
 /* Work grid */
-const grid = document.getElementById("grid");
+const gridBox = document.getElementById("grid");
+let grid = null, gridTall = null;
 WORKS.forEach(w => {
+  const tall = !!(w.tall || w.tiktok);
+  if (!grid || gridTall !== tall) {
+    grid = document.createElement("div");
+    grid.className = "grid" + (tall ? " tall" : "");
+    gridBox.appendChild(grid);
+    gridTall = tall;
+  }
   const fig = document.createElement("figure"); fig.className = "work";
   const frame = document.createElement("div"); frame.className = "frame";
 
-  if (w.youtube) {
+  const tt = w.tiktok ? String(w.tiktok).match(/\d{8,}/) : null;
+  if (tt) {
+    frame.innerHTML = '<iframe src="https://www.tiktok.com/player/v1/' + tt[0] +
+      '?autoplay=0" title="' + w.title.replace(/"/g, "") +
+      '" allow="fullscreen" loading="lazy"></iframe>';
+  } else if (w.youtube) {
     const img = document.createElement("img");
     img.src = "https://i.ytimg.com/vi/" + w.youtube + "/hqdefault.jpg";
     img.alt = ""; img.loading = "lazy";
