@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pranjal | Video Editor</title>
+<meta name="description" content="Video editor from Nepal. Short-form, YouTube, and everything in between. Flexible on pricing and schedule.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink: #14161c;
+    --ink-soft: #4a4f5c;
+    --paper: #eef0f4;
+    --panel: #ffffff;
+    --line: #d6dae2;
+    --crimson: #c8102e;
+    --blue: #1f4fa3;
+    --track: #232733;
+    --track-line: #323847;
+    --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+    --body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+    --gutter: clamp(20px, 5vw, 64px);
+    --max: 1120px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+  .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+
+  /* ---------- Top bar ---------- */
+  .bar { position: sticky; top: 0; z-index: 20; background: rgba(238,240,244,.88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .bar .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { font-family: var(--display); font-weight: 800; font-size: 20px; text-decoration: none; letter-spacing: -.01em; }
+  .bar nav { display: flex; gap: clamp(14px, 3vw, 32px); }
+  .bar nav a { text-decoration: none; font-weight: 500; font-size: 15px; color: var(--ink-soft); padding: 6px 0; }
+  .bar nav a:hover { color: var(--ink); }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: clamp(48px, 9vw, 112px) 0 0; }
+  .hero h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(44px, 9.2vw, 112px);
+    line-height: .96;
+    letter-spacing: -.035em;
+    margin: 0 0 28px;
+    max-width: 12ch;
+  }
+  .hero h1 .r { color: var(--crimson); }
+  .hero p.lead { font-size: clamp(18px, 2.2vw, 22px); max-width: 52ch; color: var(--ink-soft); margin: 0 0 32px; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: clamp(40px, 7vw, 80px); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font: 600 16px/1 var(--body);
+    padding: 16px 26px; border-radius: 999px; text-decoration: none; cursor: pointer;
+    border: 2px solid var(--ink); background: var(--ink); color: #fff;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .btn:hover { background: var(--crimson); border-color: var(--crimson); }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn.ghost:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* Timeline (the one memorable thing) */
+  .timeline {
+    background: var(--track);
+    color: #c9cfdc;
+    border-radius: 14px;
+    padding: 14px 0 18px;
+    position: relative;
+    overflow: hidden;
+    cursor: ew-resize;
+    touch-action: pan-y;
+    user-select: none;
+  }
+  .tl-head { display: flex; justify-content: space-between; align-items: center; padding: 0 18px 10px 78px; font-size: 13px; }
+  .tl-time { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 15px; color: #fff; letter-spacing: .04em; }
+  .tl-hint { color: #8d95a8; }
+  .ruler { height: 18px; margin: 0 18px 8px 78px; position: relative;
+    background-image: repeating-linear-gradient(90deg, #5a6176 0 1px, transparent 1px 5%);
+    background-size: 100% 8px; background-repeat: no-repeat; background-position: bottom; }
+  .row { display: flex; align-items: center; height: 44px; margin-bottom: 6px; }
+  .row:last-of-type { margin-bottom: 0; }
+  .row .lbl { width: 78px; flex: none; padding-left: 18px; font-size: 12px; color: #8d95a8; font-weight: 600; }
+  .row .lane { position: relative; flex: 1; height: 100%; margin-right: 18px; border-top: 1px solid var(--track-line); border-bottom: 1px solid var(--track-line); }
+  .clip {
+    position: absolute; top: 4px; bottom: 4px; border-radius: 6px;
+    padding: 0 10px; display: flex; align-items: center;
+    font-size: 12.5px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden;
+  }
+  .c-red { background: #b3182f; }
+  .c-blue { background: #2c5db5; }
+  .c-grey { background: #4b5367; }
+  .c-green { background: #2f7d6b; }
+  .playhead {
+    position: absolute; top: 0; bottom: 0; width: 2px; background: var(--crimson);
+    left: 78px; z-index: 3; pointer-events: none;
+  }
+  .playhead::before {
+    content: ""; position: absolute; top: 0; left: -6px; width: 14px; height: 14px;
+    background: var(--crimson); clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  /* ---------- Sections ---------- */
+  section { padding: clamp(64px, 10vw, 120px) 0 0; }
+  h2 { font-family: var(--display); font-weight: 800; font-size: clamp(32px, 5vw, 56px); letter-spacing: -.03em; line-height: 1.02; margin: 0 0 14px; }
+  .sub { color: var(--ink-soft); max-width: 56ch; margin: 0 0 40px; }
+
+  /* Work */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 28px 24px; }
+  .work { margin: 0; }
+  .frame { position: relative; aspect-ratio: 16 / 9; background: var(--track); border-radius: 12px; overflow: hidden; }
+  .frame img, .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
+  .play {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; cursor: pointer;
+    background: linear-gradient(180deg, rgba(20,22,28,0) 40%, rgba(20,22,28,.55));
+    display: grid; place-items: center;
+  }
+  .play span {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--crimson);
+    display: grid; place-items: center; transition: transform .15s;
+  }
+  .play:hover span { transform: scale(1.08); }
+  .play span::after { content: ""; border-left: 18px solid #fff; border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 4px; }
+  .empty {
+    position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 20px;
+    color: #9aa2b6; font-size: 14px; border: 2px dashed #3d4458; border-radius: 12px;
+  }
+  .empty b { color: #fff; font-weight: 600; display: block; margin-bottom: 4px; }
+  .work figcaption { padding-top: 12px; }
+  .work h3 { font-family: var(--display); font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -.01em; }
+  .work .tag { font-size: 14px; color: var(--ink-soft); }
+
+  .more { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+  .more p { margin: 0; color: var(--ink-soft); }
+
+  /* Services */
+  .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); border-top: 2px solid var(--ink); }
+  .svc { padding: 24px 24px 28px 0; border-bottom: 1px solid var(--line); }
+  .svc h3 { font-family: var(--display); font-size: 22px; font-weight: 700; margin: 0 0 6px; letter-spacing: -.01em; }
+  .svc p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+  /* About */
+  .about { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(28px, 6vw, 80px); align-items: start; }
+  .about p { margin: 0 0 16px; max-width: 54ch; }
+  .facts { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 8px 24px; }
+  .fact { display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .fact:last-child { border-bottom: 0; }
+  .fact dt { color: var(--ink-soft); }
+  .fact dd { margin: 0; font-weight: 600; text-align: right; }
+  .facts dl { margin: 0; }
+
+  /* Contact */
+  .contact { background: var(--ink); color: #fff; margin-top: clamp(64px, 10vw, 120px); padding: clamp(56px, 9vw, 104px) 0 40px; }
+  .contact h2 { color: #fff; max-width: 14ch; }
+  .contact .sub { color: #aab1c3; }
+  .links { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 64px; }
+  .contact .btn { background: #fff; color: var(--ink); border-color: #fff; }
+  .contact .btn:hover { background: var(--crimson); border-color: var(--crimson); color: #fff; }
+  .contact .btn.ghost { background: transparent; color: #fff; border-color: #5a6176; }
+  .contact .btn.ghost:hover { background: #fff; color: var(--ink); border-color: #fff; }
+  .foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; color: #8d95a8; font-size: 14px; border-top: 1px solid #323847; padding-top: 20px; }
+
+  .toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 999px; font-weight: 600; font-size: 15px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 50; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 760px) {
+    .about { grid-template-columns: 1fr; }
+    .tl-hint { display: none; }
+    .tl-head { padding-left: 60px; }
+    .row .lbl { width: 60px; padding-left: 12px; }
+    .ruler { margin-left: 60px; }
+    .playhead { left: 60px; }
+    .bar nav a:nth-child(2) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+</style>
+</head>
+
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top" data-name>Pranjal</a>
+    <nav aria-label="Main">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap">
+      <h1>Video editing that keeps people <span class="r">watching.</span></h1>
+      <p class="lead">I'm <span data-name>Pranjal</span>, a video editor from Nepal. Short-form, YouTube, promos and more, cut to fit your style and your deadline.</p>
+      <div class="cta-row">
+        <a class="btn" href="#work">See my work</a>
+        <a class="btn ghost" href="#contact">Hire me</a>
+      </div>
+
+      <div class="timeline" id="timeline" aria-hidden="true">
+        <div class="tl-head">
+          <span class="tl-time" id="tc">00:00:00:00</span>
+          <span class="tl-hint">Move your cursor to scrub</span>
+        </div>
+        <div class="ruler"></div>
+        <div class="row"><div class="lbl">V2</div><div class="lane">
+          <div class="clip c-blue" style="left:4%;width:20%">Typography</div>
+          <div class="clip c-green" style="left:44%;width:22%">Captions</div>
+          <div class="clip c-blue" style="left:78%;width:16%">Outro</div>
+        </div></div>
+        <div class="row"><div class="lbl">V1</div><div class="lane">
+          <div class="clip c-red" style="left:0;width:24%">Hook</div>
+          <div class="clip c-grey" style="left:25%;width:30%">Main cut</div>
+          <div class="clip c-red" style="left:56%;width:20%">B-roll</div>
+          <div class="clip c-grey" style="left:77%;width:23%">Chroma key</div>
+        </div></div>
+        <div class="row"><div class="lbl">A1</div><div class="lane">
+          <div class="clip c-green" style="left:0;width:100%">Sound design and mix</div>
+        </div></div>
+        <div class="playhead" id="playhead"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORK -->
+  <section id="work">
+    <div class="wrap">
+      <h2>Selected work</h2>
+      <p class="sub">A mix of formats and styles. Press play on any of them.</p>
+      <div class="grid" id="grid"></div>
+      <div class="more">
+        <p>Want to see more? Every project is organised in folders.</p>
+        <a class="btn" id="driveBtn" href="#contact">Browse all my work</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="wrap">
+      <h2>What I can edit</h2>
+      <p class="sub">No single niche. I adapt to the project, learn the style you want, and deliver it.</p>
+      <div class="services">
+        <div class="svc"><h3>Short-form</h3><p>Reels, Shorts and TikToks with tight pacing, hooks and captions.</p></div>
+        <div class="svc"><h3>YouTube videos</h3><p>Long-form cuts with clean story flow, graphics and sound.</p></div>
+        <div class="svc"><h3>Montages and edits</h3><p>Music-driven edits with transitions, speed ramps and effects.</p></div>
+        <div class="svc"><h3>Promos and ads</h3><p>Short, punchy videos for products, channels and brands.</p></div>
+        <div class="svc"><h3>Colour and sound</h3><p>Colour correction, grading, audio cleanup and mixing.</p></div>
+        <div class="svc"><h3>Captions and motion</h3><p>Animated subtitles, titles and simple motion graphics.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrap about">
+      <div>
+        <h2>About me</h2>
+        <p>I'm a video editor based in Nepal. I've spent years sharpening my craft, and I'm now taking on client work.</p>
+        <p>I'm an all-rounder, so I'm comfortable switching between styles and formats. Send me a reference and a rough idea, and I'll take it from there.</p>
+        <p>I'm flexible on pricing and schedules, so tell me your budget and deadline and we'll find a setup that works.</p>
+      </div>
+      <div class="facts">
+        <dl>
+          <div class="fact"><dt>Based in</dt><dd>Nepal (UTC+5:45)</dd></div>
+          <div class="fact"><dt>Rates</dt><dd>Flexible, project-based</dd></div>
+          <div class="fact"><dt>Schedule</dt><dd>Flexible</dd></div>
+          <div class="fact"><dt>Revisions</dt><dd>Included</dd></div>
+          <div class="fact"><dt>Reply time</dt><dd>Usually within a day</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- CONTACT -->
+<footer class="contact" id="contact">
+  <div class="wrap">
+    <h2>Got a video to edit?</h2>
+    <p class="sub">Send me the details, your deadline and your budget. I'll get back to you.</p>
+    <div class="links" id="links"></div>
+    <div class="foot">
+      <span>&copy; <span id="year"></span> <span data-name>Pranjal</span></span>
+      <span>Video editor, Nepal</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================
+   EDIT THIS SECTION ONLY. Everything else updates itself.
+   ===================================================== */
+const SITE = {
+  name:    "Pranjal",
+  discord: "siggy_wonders",     // your Discord username, leave "" to hide
+  twitter: "https://x.com/SGMA006",  // full link, leave "" to hide
+  instagram: "",                // full link, leave "" to hide
+  drive:   "https://drive.google.com/drive/folders/1DUD91xteClSnzBWzL7BPiBA_Y_7TcyO3?usp=sharing"  // your Google Drive folder link
+};
+
+/* Add your edits here. Upload each video to YouTube (unlisted is fine),
+   then paste the ID: the part after "v=" in youtube.com/watch?v=THIS_PART
+   For Shorts: youtube.com/shorts/THIS_PART */
+const WORKS = [
+  { title: "Gaming edit",        type: "Gaming",       youtube: "lFVOBqX_5FE" },
+  { title: "Documentary",        type: "Documentary",  youtube: "Dp3IESaTwDk" },
+  { title: "Short-form content", type: "Short-form",   youtube: "iyGJWLVMHYA" }
+];
+/* ===================================================== */
+
+/* Name, title, year */
+document.querySelectorAll("[data-name]").forEach(el => el.textContent = SITE.name);
+document.title = SITE.name + " | Video Editor";
+document.getElementById("year").textContent = new Date().getFullYear();
+
+/* Toast */
+const toast = document.getElementById("toast");
+function say(msg) {
+  toast.textContent = msg; toast.classList.add("on");
+  clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove("on"), 2200);
+}
+
+/* Contact links */
+const links = document.getElementById("links");
+function addLink(label, href, ghost) {
+  const a = document.createElement("a");
+  a.className = "btn" + (ghost ? " ghost" : "");
+  a.textContent = label; a.href = href;
+  if (href.startsWith("http")) { a.target = "_blank"; a.rel = "noopener"; }
+  links.appendChild(a);
+}
+/* Drive button under the work grid */
+const driveBtn = document.getElementById("driveBtn");
+if (SITE.drive) { driveBtn.href = SITE.drive; driveBtn.target = "_blank"; driveBtn.rel = "noopener"; }
+else { driveBtn.closest(".more").hidden = true; }
+
+if (SITE.discord) {
+  const b = document.createElement("button");
+  b.className = "btn ghost"; b.type = "button";
+  b.textContent = "Discord: " + SITE.discord;
+  b.addEventListener("click", () => {
+    (navigator.clipboard ? navigator.clipboard.writeText(SITE.discord) : Promise.reject())
+      .then(() => say("Discord username copied"), () => say("Discord: " + SITE.discord));
+  });
+  links.appendChild(b);
+}
+if (SITE.twitter) addLink("X / Twitter", SITE.twitter, true);
+if (SITE.instagram) addLink("Instagram", SITE.instagram, true);
+
+/* Work grid */
+const grid = document.getElementById("grid");
+WORKS.forEach(w => {
+  const fig = document.createElement("figure"); fig.className = "work";
+  const frame = document.createElement("div"); frame.className = "frame";
+
+  if (w.youtube) {
+    const img = document.createElement("img");
+    img.src = "https://i.ytimg.com/vi/" + w.youtube + "/hqdefault.jpg";
+    img.alt = ""; img.loading = "lazy";
+    const btn = document.createElement("button");
+    btn.className = "play"; btn.type = "button";
+    btn.setAttribute("aria-label", "Play " + w.title);
+    btn.innerHTML = "<span></span>";
+    btn.addEventListener("click", () => {
+      frame.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + w.youtube +
+        '?autoplay=1&rel=0" title="' + w.title.replace(/"/g, "") +
+        '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+    });
+    frame.append(img, btn);
+  } else {
+    frame.innerHTML = '<div class="empty"><div><b>Add your edit here</b>Paste a YouTube ID in the WORKS list</div></div>';
+  }
+
+  const cap = document.createElement("figcaption");
+  cap.innerHTML = "<h3></h3><span class='tag'></span>";
+  cap.querySelector("h3").textContent = w.title;
+  cap.querySelector(".tag").textContent = w.type;
+  fig.append(frame, cap);
+  grid.appendChild(fig);
+});
+
+/* Timeline scrubber */
+(function () {
+  const tl = document.getElementById("timeline");
+  const ph = document.getElementById("playhead");
+  const tc = document.getElementById("tc");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let pos = 0.05, target = 0.05, hovering = false, last = 0;
+
+  function lane() {
+    const l = tl.querySelector(".lane").getBoundingClientRect();
+    const t = tl.getBoundingClientRect();
+    return { left: l.left - t.left, width: l.width };
+  }
+  function render() {
+    const L = lane();
+    ph.style.left = (L.left + L.width * pos) + "px";
+    const frames = Math.floor(pos * 60 * 30);
+    const f = frames % 30, s = Math.floor(frames / 30) % 60, m = Math.floor(frames / 1800);
+    const p = n => String(n).padStart(2, "0");
+    tc.textContent = "00:" + p(m) + ":" + p(s) + ":" + p(f);
+  }
+  function setFromEvent(e) {
+    const L = lane(), t = tl.getBoundingClientRect();
+    target = Math.min(1, Math.max(0, (e.clientX - t.left - L.left) / L.width));
+  }
+  tl.addEventListener("pointermove", e => { hovering = true; setFromEvent(e); });
+  tl.addEventListener("pointerdown", e => { hovering = true; setFromEvent(e); });
+  tl.addEventListener("pointerleave", () => { hovering = false; });
+  addEventListener("resize", render);
+
+  function tick(now) {
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    if (hovering) {
+      pos += (target - pos) * 0.2;
+    } else {
+      pos = (pos + dt * 0.025) % 1;   /* slow auto-play when idle */
+      target = pos;
+    }
+    render();
+    requestAnimationFrame(tick);
+  }
+  if (reduce) { render(); } else { requestAnimationFrame(t => { last = t; tick(t); }); }
+})();
+</script>
+</body>
+</html>
