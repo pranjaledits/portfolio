@@ -163,8 +163,6 @@
   .status { display: inline-flex; align-items: center; gap: 9px; margin: 0 0 24px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); font-size: 14px; font-weight: 500; color: var(--ink-soft); }
   .status i { width: 8px; height: 8px; border-radius: 50%; background: #2f9e6b; box-shadow: 0 0 0 4px rgba(47,158,107,.18); }
 
-  .more { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
-  .more p { margin: 0; color: var(--ink-soft); }
 
   /* Services */
   .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); border-top: 2px solid var(--ink); }
@@ -209,10 +207,58 @@
     html { scroll-behavior: auto; }
     * { transition: none !important; }
   }
+
+  /* ---------- Upgrade: colour, glow, depth ---------- */
+  :root { --grad: linear-gradient(110deg, #ff3d5a 0%, #7b4dff 55%, #2c8bff 100%); --violet: #7b4dff; }
+  ::selection { background: var(--violet); color: #fff; }
+  .progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 40; background: var(--grad); transform: scaleX(0); transform-origin: 0 50%; }
+  .bar { background: rgba(238,240,244,.72); backdrop-filter: blur(14px) saturate(1.4); }
+
+  .hero { position: relative; isolation: isolate; }
+  .hero::before { content: ""; position: absolute; inset: -64px 0 -40px; z-index: -1;
+    background: radial-gradient(520px 340px at 88% 6%, rgba(123,77,255,.24), transparent 65%),
+                radial-gradient(460px 320px at 6% 22%, rgba(255,61,90,.18), transparent 65%),
+                radial-gradient(520px 380px at 62% 96%, rgba(44,139,255,.18), transparent 65%); }
+  .hero::after { content: ""; position: absolute; inset: -64px 0 0; z-index: -1;
+    background-image: linear-gradient(rgba(20,22,28,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(20,22,28,.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000, transparent 75%); }
+  .hero h1 .r { background: var(--grad); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shift 8s ease-in-out infinite alternate; }
+  @keyframes shift { to { background-position: 100% 0; } }
+
+  .btn { transition: transform .15s, box-shadow .15s, background-position .4s, color .15s, border-color .15s; }
+  .btn:not(.ghost) { background: var(--grad); background-size: 140% 100%; border-color: transparent; box-shadow: 0 12px 28px -12px rgba(123,77,255,.7); }
+  .btn:not(.ghost):hover { background-position: 100% 0; border-color: transparent; transform: translateY(-2px); box-shadow: 0 16px 32px -12px rgba(255,61,90,.7); }
+  .btn.ghost { background: rgba(255,255,255,.6); backdrop-filter: blur(6px); }
+
+  .timeline { background: linear-gradient(180deg, #262b3a, #161922); box-shadow: 0 40px 70px -36px rgba(123,77,255,.6), inset 0 0 0 1px rgba(255,255,255,.06); }
+  .c-red { background: linear-gradient(135deg, #ff4560, #b3182f); }
+  .c-blue { background: linear-gradient(135deg, #4d90ff, #2c5db5); }
+  .c-green { background: linear-gradient(135deg, #3bc0a0, #2a7664); }
+  .c-grey { background: linear-gradient(135deg, #5a6379, #424a5e); }
+  .playhead { background: #ff3d5a; box-shadow: 0 0 16px rgba(255,61,90,.95); }
+
+  .thumb:hover { box-shadow: 0 0 0 3px rgba(123,77,255,.55), 0 24px 40px -18px rgba(123,77,255,.6); }
+  .dot { background: var(--grad); box-shadow: 0 8px 22px -6px rgba(123,77,255,.8); }
+
+  section h2::after { content: ""; display: block; width: 56px; height: 4px; border-radius: 4px; background: var(--grad); margin-top: 16px; }
+
+  .services { border-top: 0; gap: 18px; }
+  .svc { position: relative; overflow: hidden; padding: 28px 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; transition: transform .2s, box-shadow .2s, border-color .2s; }
+  .svc::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--grad); }
+  .svc:hover { transform: translateY(-4px); border-color: transparent; box-shadow: 0 0 0 1px rgba(123,77,255,.35), 0 22px 40px -22px rgba(123,77,255,.55); }
+
+  .facts { border: 1px solid transparent; background: linear-gradient(var(--panel), var(--panel)) padding-box, var(--grad) border-box; box-shadow: 0 24px 50px -30px rgba(123,77,255,.5); }
+
+  .contact { background: radial-gradient(640px 380px at 92% 0%, rgba(123,77,255,.38), transparent 65%), radial-gradient(560px 380px at 0% 100%, rgba(255,61,90,.3), transparent 65%), var(--ink); }
+
+  @media (prefers-reduced-motion: reduce) { .hero h1 .r { animation: none; } }
 </style>
 </head>
 
 <body>
+<div class="progress" id="progress"></div>
 
 <header class="bar">
   <div class="wrap">
@@ -270,10 +316,6 @@
       <h2>Selected work</h2>
       <p class="sub">A mix of formats and styles. Press play on any of them.</p>
       <div class="grid" id="grid"></div>
-      <div class="more">
-        <p>Want to see more? Every project is organised in folders.</p>
-        <a class="btn" id="driveBtn" href="#contact">Browse all my work</a>
-      </div>
     </div>
   </section>
 
@@ -346,7 +388,6 @@ const SITE = {
   discord: "siggy_wonders",     // your Discord username, leave "" to hide
   twitter: "https://x.com/SGMA006",  // full link, leave "" to hide
   instagram: "",                // full link, leave "" to hide
-  drive:   "https://drive.google.com/drive/folders/1DUD91xteClSnzBWzL7BPiBA_Y_7TcyO3?usp=sharing"  // your Google Drive folder link
 };
 
 /* Add your edits here. The order of this list is the order on the site.
@@ -386,11 +427,6 @@ function addLink(label, href, ghost) {
   if (href.startsWith("http")) { a.target = "_blank"; a.rel = "noopener"; }
   links.appendChild(a);
 }
-/* Drive button under the work grid */
-const driveBtn = document.getElementById("driveBtn");
-if (SITE.drive) { driveBtn.href = SITE.drive; driveBtn.target = "_blank"; driveBtn.rel = "noopener"; }
-else { driveBtn.closest(".more").hidden = true; }
-
 if (SITE.discord) {
   const b = document.createElement("button");
   b.className = "btn ghost"; b.type = "button";
@@ -515,6 +551,18 @@ WORKS.forEach(w => {
     requestAnimationFrame(tick);
   }
   if (reduce) { render(); } else { requestAnimationFrame(t => { last = t; tick(t); }); }
+})();
+
+/* Scroll progress bar */
+(function () {
+  const bar = document.getElementById("progress");
+  function set() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = "scaleX(" + (max > 0 ? Math.min(1, scrollY / max) : 0) + ")";
+  }
+  addEventListener("scroll", set, { passive: true });
+  addEventListener("resize", set);
+  set();
 })();
 </script>
 </body>
